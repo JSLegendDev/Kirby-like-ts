@@ -1,8 +1,8 @@
-import kaboom, { GameObj, GameObjRaw, SpriteComp } from "kaboom";
+import kaboom, { GameObj } from "kaboom";
 
 const scale = 4;
 const k = kaboom({
-  width: 160 * scale,
+  width: 256 * scale,
   height: 144 * scale,
   letterbox: true,
   global: false,
@@ -17,6 +17,7 @@ k.loadSprite("assets", "./kirby-like.png", {
     kirbSwallowed: 2,
   },
 });
+k.loadSprite("level-1", "./level-1.png");
 
 function setControls(kirb: GameObj) {
   k.onKeyDown((key) => {
@@ -53,9 +54,38 @@ function setControls(kirb: GameObj) {
   });
 }
 
-k.scene("level-1", () => {
+async function makeMap(name: string) {
+  const mapData = await (await fetch(`./${name}.json`)).json();
+
+  const map = k.make([k.sprite(name), k.scale(4), k.pos(0)]);
+
+  for (const layer of mapData.layers) {
+    if (layer.name === "colliders") {
+      for (const collider of layer.objects) {
+        map.add([
+          k.area({
+            shape: new k.Rect(k.vec2(0), collider.width, collider.height),
+          }),
+          k.body({ isStatic: true }),
+          k.pos(collider.x, collider.y),
+        ]);
+      }
+
+      return map;
+    }
+  }
+}
+
+k.scene("level-1", async () => {
   k.setGravity(2200);
-  k.add([k.rect(k.width(), k.height()), k.color(k.Color.fromHex("#f7d7db"))]);
+  k.add([
+    k.rect(k.width(), k.height()),
+    k.color(k.Color.fromHex("#f7d7db")),
+    k.fixed(),
+  ]);
+
+  const map = await makeMap("level-1");
+  k.add(map);
 
   const kirb: GameObj = k.make([
     k.sprite("assets", { anim: "kirbIdle" }),
@@ -65,19 +95,13 @@ k.scene("level-1", () => {
     k.scale(4),
     k.doubleJump(10),
     {
-      speed: 200,
+      speed: 300,
     },
   ]);
 
   setControls(kirb);
   k.add(kirb);
-
-  k.add([
-    k.rect(1000, 50),
-    k.pos(0, 500),
-    k.area(),
-    k.body({ isStatic: true }),
-  ]);
+  k.onUpdate(() => k.camPos(kirb.pos.x, kirb.pos.y - 100));
 });
 
 k.go("level-1");
