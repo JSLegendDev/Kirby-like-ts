@@ -65,9 +65,11 @@ async function makeMap(name: string) {
         map.add([
           k.area({
             shape: new k.Rect(k.vec2(0), collider.width, collider.height),
+            collisionIgnore: ["platform", "exit"],
           }),
           k.body({ isStatic: true }),
           k.pos(collider.x, collider.y),
+          collider.name !== "exit" ? "platform" : "exit",
         ]);
       }
 
@@ -77,7 +79,7 @@ async function makeMap(name: string) {
 }
 
 k.scene("level-1", async () => {
-  k.setGravity(2200);
+  k.setGravity(2100);
   k.add([
     k.rect(k.width(), k.height()),
     k.color(k.Color.fromHex("#f7d7db")),
