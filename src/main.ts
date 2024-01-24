@@ -1,4 +1,4 @@
-import kaboom from "kaboom";
+import kaboom, { GameObj, GameObjRaw, SpriteComp } from "kaboom";
 
 const scale = 4;
 const k = kaboom({
@@ -18,11 +18,46 @@ k.loadSprite("assets", "./kirby-like.png", {
   },
 });
 
+function setControls(kirb: GameObj) {
+  k.onKeyDown((key) => {
+    switch (key) {
+      case "left":
+        kirb.flipX = true;
+        kirb.move(-kirb.speed, 0);
+        break;
+      case "right":
+        kirb.flipX = false;
+        kirb.move(kirb.speed, 0);
+        break;
+      case "z":
+        kirb.play("kirbInhaling");
+        break;
+      default:
+    }
+  });
+  k.onKeyPress((key) => {
+    switch (key) {
+      case "space":
+        kirb.doubleJump();
+        break;
+      default:
+    }
+  });
+  k.onKeyRelease((key) => {
+    switch (key) {
+      case "z":
+        kirb.play("kirbIdle");
+        break;
+      default:
+    }
+  });
+}
+
 k.scene("level-1", () => {
   k.setGravity(2200);
   k.add([k.rect(k.width(), k.height()), k.color(k.Color.fromHex("#f7d7db"))]);
 
-  const kirb = k.add([
+  const kirb: GameObj = k.make([
     k.sprite("assets", { anim: "kirbIdle" }),
     k.area({ shape: new k.Rect(k.vec2(0), 16, 16) }),
     k.body(),
@@ -31,32 +66,11 @@ k.scene("level-1", () => {
     k.doubleJump(10),
     {
       speed: 200,
-      setControls() {
-        k.onKeyDown((key) => {
-          switch (key) {
-            case "left":
-              this.flipX = true;
-              this.move(-this.speed, 0);
-              break;
-            case "right":
-              this.flipX = false;
-              this.move(this.speed, 0);
-              break;
-            default:
-          }
-        });
-        k.onKeyPress((key) => {
-          switch (key) {
-            case "space":
-              this.jump();
-              break;
-            default:
-          }
-        });
-      },
     },
   ]);
-  kirb.setControls();
+
+  setControls(kirb);
+  k.add(kirb);
 
   k.add([
     k.rect(1000, 50),
