@@ -1,4 +1,4 @@
-import kaboom, { GameObj } from "kaboom";
+import kaboom, { GameObj, KaboomCtx, Vec2 } from "kaboom";
 
 const scale = 4;
 const k = kaboom({
@@ -15,6 +15,10 @@ k.loadSprite("assets", "./kirby-like.png", {
     kirbIdle: 0,
     kirbInhaling: 1,
     kirbSwallowed: 2,
+    flame: { from: 36, to: 37, speed: 4, loop: true },
+    guyIdle: 18,
+    guyWalk: { from: 18, to: 19, speed: 4, loop: true },
+    bird: { from: 27, to: 28, speed: 4, loop: true },
   },
 });
 k.loadSprite("level-1", "./level-1.png");
@@ -128,17 +132,18 @@ k.scene("level-1", async () => {
 
   for (const flame of spawnPoints.flame) {
     k.add([
-      k.rect(16, 16),
+      k.sprite("assets", { anim: "flame" }),
       k.scale(4),
       k.pos(flame.x * scale, flame.y * scale),
       k.area(),
       k.body(),
+      "flame",
     ]);
   }
 
   for (const guy of spawnPoints.guy) {
     k.add([
-      k.rect(16, 16),
+      k.sprite("assets", { anim: "guyWalk" }),
       k.scale(4),
       k.pos(guy.x * scale, guy.y * scale),
       k.area(),
@@ -148,11 +153,11 @@ k.scene("level-1", async () => {
 
   for (const bird of spawnPoints.bird) {
     k.add([
-      k.rect(16, 16),
+      k.sprite("assets", { anim: "bird" }),
       k.scale(4),
       k.pos(bird.x * scale, bird.y * scale),
       k.area(),
-      k.body(),
+      k.body({ isStatic: true }),
     ]);
   }
 });
