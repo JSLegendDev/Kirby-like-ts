@@ -59,6 +59,8 @@ async function makeMap(name: string) {
 
   const map = k.make([k.sprite(name), k.scale(4), k.pos(0)]);
 
+  const spawnPoints: { [key: string]: { x: number; y: number }[] } = {};
+
   for (const layer of mapData.layers) {
     if (layer.name === "colliders") {
       for (const collider of layer.objects) {
@@ -72,10 +74,23 @@ async function makeMap(name: string) {
           collider.name !== "exit" ? "platform" : "exit",
         ]);
       }
-
-      return map;
+      continue;
+    }
+    if (layer.name === "spawnpoints") {
+      for (const spawnPoint of layer.objects) {
+        if (spawnPoints[spawnPoint.name]) {
+          spawnPoints[spawnPoint.name].push({
+            x: spawnPoint.x,
+            y: spawnPoint.y,
+          });
+          continue;
+        }
+        spawnPoints[spawnPoint.name] = [{ x: spawnPoint.x, y: spawnPoint.y }];
+      }
     }
   }
+
+  return { map, spawnPoints };
 }
 
 k.scene("level-1", async () => {
@@ -86,14 +101,14 @@ k.scene("level-1", async () => {
     k.fixed(),
   ]);
 
-  const map = await makeMap("level-1");
+  const { map, spawnPoints } = await makeMap("level-1");
   k.add(map);
 
   const kirb: GameObj = k.make([
     k.sprite("assets", { anim: "kirbIdle" }),
     k.area({ shape: new k.Rect(k.vec2(0), 16, 16) }),
     k.body(),
-    k.pos(k.center()),
+    k.pos(spawnPoints.player[0].x * scale, spawnPoints.player[0].y * scale),
     k.scale(4),
     k.doubleJump(10),
     {
@@ -110,7 +125,16 @@ k.scene("level-1", async () => {
     }
     k.camPos(kirb.pos.x, 900);
   });
-  //k.camPos(500, 900);
+
+  for (const flame of spawnPoints.flame) {
+    k.add([
+      k.rect(16, 16),
+      k.scale(4),
+      k.pos(flame.x * scale, flame.y * scale),
+      k.area(),
+      k.body(),
+    ]);
+  }
 });
 
 k.go("level-1");
