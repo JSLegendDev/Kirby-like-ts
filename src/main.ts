@@ -135,6 +135,26 @@ k.scene("level-1", async () => {
       k.body(),
     ]);
   }
+
+  for (const guy of spawnPoints.guy) {
+    k.add([
+      k.rect(16, 16),
+      k.scale(4),
+      k.pos(guy.x * scale, guy.y * scale),
+      k.area(),
+      k.body(),
+    ]);
+  }
+
+  for (const bird of spawnPoints.bird) {
+    k.add([
+      k.rect(16, 16),
+      k.scale(4),
+      k.pos(bird.x * scale, bird.y * scale),
+      k.area(),
+      k.body(),
+    ]);
+  }
 });
 
 k.go("level-1");
