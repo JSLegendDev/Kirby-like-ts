@@ -103,7 +103,7 @@ k.scene("level-1", async () => {
 
   setControls(kirb);
   k.add(kirb);
-  k.onUpdate(() => k.camPos(kirb.pos.x, kirb.pos.y - 100));
+  k.camPos(500, 900);
 });
 
 k.go("level-1");
