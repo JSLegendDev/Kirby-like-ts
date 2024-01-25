@@ -110,7 +110,7 @@ k.scene("level-1", async () => {
 
   const kirb: GameObj = k.make([
     k.sprite("assets", { anim: "kirbIdle" }),
-    k.area({ shape: new k.Rect(k.vec2(0), 16, 16) }),
+    k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
     k.body(),
     k.pos(spawnPoints.player[0].x * scale, spawnPoints.player[0].y * scale),
     k.scale(4),
@@ -135,7 +135,7 @@ k.scene("level-1", async () => {
       k.sprite("assets", { anim: "flame" }),
       k.scale(4),
       k.pos(flame.x * scale, flame.y * scale),
-      k.area(),
+      k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
       k.body(),
       "flame",
     ]);
@@ -146,7 +146,7 @@ k.scene("level-1", async () => {
       k.sprite("assets", { anim: "guyWalk" }),
       k.scale(4),
       k.pos(guy.x * scale, guy.y * scale),
-      k.area(),
+      k.area({ shape: new k.Rect(k.vec2(2, 4), 12, 12) }),
       k.body(),
     ]);
   }
@@ -156,7 +156,7 @@ k.scene("level-1", async () => {
       k.sprite("assets", { anim: "bird" }),
       k.scale(4),
       k.pos(bird.x * scale, bird.y * scale),
-      k.area(),
+      k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
       k.body({ isStatic: true }),
     ]);
   }
