@@ -67,7 +67,7 @@ async function makeMap(name: string) {
             shape: new k.Rect(k.vec2(0), collider.width, collider.height),
             collisionIgnore: ["platform", "exit"],
           }),
-          k.body({ isStatic: true }),
+          collider.name !== "exit" ? k.body({ isStatic: true }) : null,
           k.pos(collider.x, collider.y),
           collider.name !== "exit" ? "platform" : "exit",
         ]);
@@ -103,7 +103,14 @@ k.scene("level-1", async () => {
 
   setControls(kirb);
   k.add(kirb);
-  k.camPos(500, 900);
+  k.onUpdate(() => {
+    if (kirb.pos.y < 600) {
+      k.camPos(kirb.pos.x, 500);
+      return;
+    }
+    k.camPos(kirb.pos.x, 900);
+  });
+  //k.camPos(500, 900);
 });
 
 k.go("level-1");
