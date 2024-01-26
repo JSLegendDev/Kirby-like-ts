@@ -5,6 +5,8 @@ const k = kaboom({
   width: 256 * scale,
   height: 144 * scale,
   letterbox: true,
+  scale, // Work around for a Kaboom bug. Need to both set scaling here and scale sprites so that
+  // each pixel takes mostly the correct amount of space.
   global: false,
 });
 
@@ -110,7 +112,7 @@ k.scene("level-1", async () => {
 
   const kirb: GameObj = k.make([
     k.sprite("assets", { anim: "kirbIdle" }),
-    k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
+    k.area({ shape: new k.Rect(k.vec2(4, 5.9), 8, 10) }),
     k.body(),
     k.pos(spawnPoints.player[0].x * scale, spawnPoints.player[0].y * scale),
     k.scale(4),
