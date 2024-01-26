@@ -120,6 +120,7 @@ k.scene("level-1", async () => {
     {
       speed: 300,
     },
+    "kirb",
   ]);
 
   setControls(kirb);
@@ -150,6 +151,7 @@ k.scene("level-1", async () => {
       k.pos(guy.x * scale, guy.y * scale),
       k.area({ shape: new k.Rect(k.vec2(2, 4), 12, 12) }),
       k.body(),
+      "guy",
     ]);
   }
 
@@ -160,6 +162,7 @@ k.scene("level-1", async () => {
       k.pos(bird.x * scale, bird.y * scale),
       k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
       k.body({ isStatic: true }),
+      "bird",
     ]);
   }
 });
