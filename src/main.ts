@@ -1,4 +1,4 @@
-import kaboom, { GameObj, KaboomCtx, Vec2 } from "kaboom";
+import kaboom, { GameObj } from "kaboom";
 
 const scale = 4;
 const k = kaboom({
@@ -63,7 +63,7 @@ function setControls(kirb: GameObj) {
 async function makeMap(name: string) {
   const mapData = await (await fetch(`./${name}.json`)).json();
 
-  const map = k.make([k.sprite(name), k.scale(4), k.pos(0)]);
+  const map = k.make([k.sprite(name), k.scale(scale), k.pos(0)]);
 
   const spawnPoints: { [key: string]: { x: number; y: number }[] } = {};
 
@@ -115,7 +115,7 @@ k.scene("level-1", async () => {
     k.area({ shape: new k.Rect(k.vec2(4, 5.9), 8, 10) }),
     k.body(),
     k.pos(spawnPoints.player[0].x * scale, spawnPoints.player[0].y * scale),
-    k.scale(4),
+    k.scale(scale),
     k.doubleJump(10),
     {
       speed: 300,
@@ -135,7 +135,7 @@ k.scene("level-1", async () => {
   for (const flame of spawnPoints.flame) {
     k.add([
       k.sprite("assets", { anim: "flame" }),
-      k.scale(4),
+      k.scale(scale),
       k.pos(flame.x * scale, flame.y * scale),
       k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
       k.body(),
@@ -146,7 +146,7 @@ k.scene("level-1", async () => {
   for (const guy of spawnPoints.guy) {
     k.add([
       k.sprite("assets", { anim: "guyWalk" }),
-      k.scale(4),
+      k.scale(scale),
       k.pos(guy.x * scale, guy.y * scale),
       k.area({ shape: new k.Rect(k.vec2(2, 4), 12, 12) }),
       k.body(),
@@ -156,7 +156,7 @@ k.scene("level-1", async () => {
   for (const bird of spawnPoints.bird) {
     k.add([
       k.sprite("assets", { anim: "bird" }),
-      k.scale(4),
+      k.scale(scale),
       k.pos(bird.x * scale, bird.y * scale),
       k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
       k.body({ isStatic: true }),
