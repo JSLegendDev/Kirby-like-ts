@@ -91,8 +91,35 @@ export function setControls(k: KaboomCtx, player: PlayerGameObj) {
   });
 }
 
+export function makeInhalable(k: KaboomCtx, enemy: GameObj) {
+  enemy.onCollide("inhaleZone", () => {
+    enemy.isInhalable = true;
+  });
+
+  enemy.onCollideEnd("inhaleZone", () => {
+    enemy.isInhalable = false;
+  });
+
+  const playerRef = k.get("player")[0];
+  enemy.onUpdate(() => {
+    if (playerRef.isInhaling && enemy.isInhalable) {
+      if (playerRef.direction === "right") {
+        enemy.moveTo(enemy.pos.sub(playerRef.pos), 200);
+        return;
+      }
+      enemy.moveTo(enemy.pos.add(playerRef.pos), 200);
+    }
+  });
+
+  enemy.onCollide("player", () => {
+    if (!playerRef.isInhaling) return;
+    playerRef.isInhaling = false;
+    k.destroy(enemy);
+  });
+}
+
 export function makeFlameEnemy(k: KaboomCtx, posX: number, posY: number) {
-  k.add([
+  const flame = k.add([
     k.sprite("assets", { anim: "flame" }),
     k.scale(scale),
     k.pos(posX * scale, posY * scale),
@@ -100,6 +127,10 @@ export function makeFlameEnemy(k: KaboomCtx, posX: number, posY: number) {
     k.body(),
     "flame",
   ]);
+
+  makeInhalable(k, flame);
+
+  return flame;
 }
 
 export function makeGuyEnemy(k: KaboomCtx, posX: number, posY: number) {
@@ -113,36 +144,13 @@ export function makeGuyEnemy(k: KaboomCtx, posX: number, posY: number) {
     "guy",
   ]);
 
-  guy.onCollide("inhaleZone", () => {
-    guy.isInhalable = true;
-  });
-
-  guy.onCollideEnd("inhaleZone", () => {
-    guy.isInhalable = false;
-  });
-
-  const playerRef = k.get("player")[0];
-  guy.onUpdate(() => {
-    if (playerRef.isInhaling && guy.isInhalable) {
-      if (playerRef.direction === "right") {
-        guy.moveTo(guy.pos.sub(playerRef.pos), 100);
-        return;
-      }
-      guy.moveTo(guy.pos.add(playerRef.pos), 100);
-    }
-  });
-
-  guy.onCollide("player", () => {
-    if (!playerRef.isInhaling) return;
-    playerRef.isInhaling = false;
-    k.destroy(guy);
-  });
+  makeInhalable(k, guy);
 
   return guy;
 }
 
 export function makeBirdEnemy(k: KaboomCtx, posX: number, posY: number) {
-  k.add([
+  const bird = k.add([
     k.sprite("assets", { anim: "bird" }),
     k.scale(scale),
     k.pos(posX * scale, posY * scale),
@@ -150,4 +158,8 @@ export function makeBirdEnemy(k: KaboomCtx, posX: number, posY: number) {
     k.body({ isStatic: true }),
     "bird",
   ]);
+
+  makeInhalable(k, bird);
+
+  return bird;
 }

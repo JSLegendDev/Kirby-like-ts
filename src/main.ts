@@ -1,6 +1,4 @@
-import { GameObj } from "kaboom";
 import { k } from "./kaboomCtx";
-import { scale } from "./constants";
 import { makeMap } from "./utils";
 import {
   makeBirdEnemy,
