@@ -2,7 +2,13 @@ import { GameObj } from "kaboom";
 import { k } from "./kaboomCtx";
 import { scale } from "./constants";
 import { makeMap } from "./utils";
-import { makePlayer, setControls } from "./entities";
+import {
+  makeBirdEnemy,
+  makeFlameEnemy,
+  makeGuyEnemy,
+  makePlayer,
+  setControls,
+} from "./entities";
 
 k.loadSprite("assets", "./kirby-like.png", {
   sliceX: 9,
@@ -43,36 +49,15 @@ k.scene("level-1", async () => {
   });
 
   for (const flame of spawnPoints.flame) {
-    k.add([
-      k.sprite("assets", { anim: "flame" }),
-      k.scale(scale),
-      k.pos(flame.x * scale, flame.y * scale),
-      k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
-      k.body(),
-      "flame",
-    ]);
+    makeFlameEnemy(k, flame.x, flame.y);
   }
 
   for (const guy of spawnPoints.guy) {
-    k.add([
-      k.sprite("assets", { anim: "guyWalk" }),
-      k.scale(scale),
-      k.pos(guy.x * scale, guy.y * scale),
-      k.area({ shape: new k.Rect(k.vec2(2, 4), 12, 12) }),
-      k.body(),
-      "guy",
-    ]);
+    makeGuyEnemy(k, guy.x, guy.y);
   }
 
   for (const bird of spawnPoints.bird) {
-    k.add([
-      k.sprite("assets", { anim: "bird" }),
-      k.scale(scale),
-      k.pos(bird.x * scale, bird.y * scale),
-      k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
-      k.body({ isStatic: true }),
-      "bird",
-    ]);
+    makeBirdEnemy(k, bird.x, bird.y);
   }
 });
 
