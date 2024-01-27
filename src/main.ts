@@ -1,14 +1,8 @@
-import kaboom, { GameObj } from "kaboom";
-
-const scale = 4;
-const k = kaboom({
-  width: 256 * scale,
-  height: 144 * scale,
-  letterbox: true,
-  scale, // Work around for a Kaboom bug. Need to both set scaling here and scale sprites so that
-  // each pixel takes mostly the correct amount of space.
-  global: false,
-});
+import { GameObj } from "kaboom";
+import { k } from "./kaboomCtx";
+import { scale } from "./constants";
+import { makeMap } from "./utils";
+import { makePlayer, setControls } from "./entities";
 
 k.loadSprite("assets", "./kirby-like.png", {
   sliceX: 9,
@@ -25,80 +19,6 @@ k.loadSprite("assets", "./kirby-like.png", {
 });
 k.loadSprite("level-1", "./level-1.png");
 
-function setControls(kirb: GameObj) {
-  k.onKeyDown((key) => {
-    switch (key) {
-      case "left":
-        kirb.flipX = true;
-        kirb.move(-kirb.speed, 0);
-        break;
-      case "right":
-        kirb.flipX = false;
-        kirb.move(kirb.speed, 0);
-        break;
-      case "z":
-        kirb.play("kirbInhaling");
-        break;
-      default:
-    }
-  });
-  k.onKeyPress((key) => {
-    switch (key) {
-      case "space":
-        kirb.doubleJump();
-        break;
-      default:
-    }
-  });
-  k.onKeyRelease((key) => {
-    switch (key) {
-      case "z":
-        kirb.play("kirbIdle");
-        break;
-      default:
-    }
-  });
-}
-
-async function makeMap(name: string) {
-  const mapData = await (await fetch(`./${name}.json`)).json();
-
-  const map = k.make([k.sprite(name), k.scale(scale), k.pos(0)]);
-
-  const spawnPoints: { [key: string]: { x: number; y: number }[] } = {};
-
-  for (const layer of mapData.layers) {
-    if (layer.name === "colliders") {
-      for (const collider of layer.objects) {
-        map.add([
-          k.area({
-            shape: new k.Rect(k.vec2(0), collider.width, collider.height),
-            collisionIgnore: ["platform", "exit"],
-          }),
-          collider.name !== "exit" ? k.body({ isStatic: true }) : null,
-          k.pos(collider.x, collider.y),
-          collider.name !== "exit" ? "platform" : "exit",
-        ]);
-      }
-      continue;
-    }
-    if (layer.name === "spawnpoints") {
-      for (const spawnPoint of layer.objects) {
-        if (spawnPoints[spawnPoint.name]) {
-          spawnPoints[spawnPoint.name].push({
-            x: spawnPoint.x,
-            y: spawnPoint.y,
-          });
-          continue;
-        }
-        spawnPoints[spawnPoint.name] = [{ x: spawnPoint.x, y: spawnPoint.y }];
-      }
-    }
-  }
-
-  return { map, spawnPoints };
-}
-
 k.scene("level-1", async () => {
   k.setGravity(2100);
   k.add([
@@ -107,23 +27,12 @@ k.scene("level-1", async () => {
     k.fixed(),
   ]);
 
-  const { map, spawnPoints } = await makeMap("level-1");
+  const { map, spawnPoints } = await makeMap(k, "level-1");
   k.add(map);
 
-  const kirb: GameObj = k.make([
-    k.sprite("assets", { anim: "kirbIdle" }),
-    k.area({ shape: new k.Rect(k.vec2(4, 5.9), 8, 10) }),
-    k.body(),
-    k.pos(spawnPoints.player[0].x * scale, spawnPoints.player[0].y * scale),
-    k.scale(scale),
-    k.doubleJump(10),
-    {
-      speed: 300,
-    },
-    "kirb",
-  ]);
+  const kirb = makePlayer(k, spawnPoints.player[0].x, spawnPoints.player[0].y);
 
-  setControls(kirb);
+  setControls(k, kirb);
   k.add(kirb);
   k.onUpdate(() => {
     if (kirb.pos.y < 600) {
