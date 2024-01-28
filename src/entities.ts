@@ -3,7 +3,9 @@ import {
   BodyComp,
   DoubleJumpComp,
   GameObj,
+  HealthComp,
   KaboomCtx,
+  OpacityComp,
   PosComp,
   ScaleComp,
   SpriteComp,
@@ -16,7 +18,9 @@ type PlayerGameObj = GameObj<
     BodyComp &
     PosComp &
     ScaleComp &
-    DoubleJumpComp & { speed: number; direction: string; isInhaling: boolean }
+    DoubleJumpComp &
+    HealthComp &
+    OpacityComp & { speed: number; direction: string; isInhaling: boolean }
 >;
 
 export function makePlayer(k: KaboomCtx, posX: number, posY: number) {
@@ -27,6 +31,8 @@ export function makePlayer(k: KaboomCtx, posX: number, posY: number) {
     k.pos(posX * scale, posY * scale),
     k.scale(scale),
     k.doubleJump(10),
+    k.health(3),
+    k.opacity(1),
     {
       speed: 300,
       direction: "right",
@@ -34,6 +40,36 @@ export function makePlayer(k: KaboomCtx, posX: number, posY: number) {
     },
     "player",
   ]);
+
+  player.onCollide("enemy", async (enemy) => {
+    if (player.isInhaling) {
+      player.isInhaling = false;
+      k.destroy(enemy);
+      return;
+    }
+
+    if (player.hp() === 0) {
+      k.destroy(player);
+      k.go("level-1");
+      return;
+    }
+
+    player.hurt();
+    await k.tween(
+      player.opacity,
+      0,
+      0.05,
+      (val) => (player.opacity = val),
+      k.easings.linear
+    );
+    await k.tween(
+      player.opacity,
+      1,
+      0.05,
+      (val) => (player.opacity = val),
+      k.easings.linear
+    );
+  });
 
   const inhaleEffect = k.add([
     k.sprite("assets", { anim: "kirbInhaleEffect" }),
@@ -59,6 +95,12 @@ export function makePlayer(k: KaboomCtx, posX: number, posY: number) {
     inhaleZone.pos = k.vec2(14, 8);
     inhaleEffect.pos = k.vec2(player.pos.x + 60, player.pos.y + 0);
     inhaleEffect.flipX = false;
+  });
+
+  player.onUpdate(() => {
+    if (player.pos.y > 2000) {
+      k.go("level-1");
+    }
   });
 
   return player;
@@ -126,12 +168,6 @@ export function makeInhalable(k: KaboomCtx, enemy: GameObj) {
       enemy.moveTo(enemy.pos.add(playerRef.pos), 200);
     }
   });
-
-  enemy.onCollide("player", () => {
-    if (!playerRef.isInhaling || !enemy.isInhalable) return;
-    playerRef.isInhaling = false;
-    k.destroy(enemy);
-  });
 }
 
 export function makeFlameEnemy(k: KaboomCtx, posX: number, posY: number) {
@@ -142,6 +178,7 @@ export function makeFlameEnemy(k: KaboomCtx, posX: number, posY: number) {
     k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
     k.body(),
     "flame",
+    "enemy",
   ]);
 
   makeInhalable(k, flame);
@@ -158,6 +195,7 @@ export function makeGuyEnemy(k: KaboomCtx, posX: number, posY: number) {
     k.body(),
     { isInhalable: false },
     "guy",
+    "enemy",
   ]);
 
   makeInhalable(k, guy);
@@ -173,6 +211,7 @@ export function makeBirdEnemy(k: KaboomCtx, posX: number, posY: number) {
     k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
     k.body({ isStatic: true }),
     "bird",
+    "enemy",
   ]);
 
   makeInhalable(k, bird);
