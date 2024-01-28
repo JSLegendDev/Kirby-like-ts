@@ -42,7 +42,7 @@ export function makePlayer(k: KaboomCtx, posX: number, posY: number) {
   ]);
 
   player.onCollide("enemy", async (enemy) => {
-    if (player.isInhaling) {
+    if (player.isInhaling && enemy.isInhalable) {
       player.isInhaling = false;
       k.destroy(enemy);
       return;
