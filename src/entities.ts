@@ -35,6 +35,14 @@ export function makePlayer(k: KaboomCtx, posX: number, posY: number) {
     "player",
   ]);
 
+  const inhaleEffect = k.add([
+    k.sprite("assets", { anim: "kirbInhaleEffect" }),
+    k.pos(),
+    k.scale(scale),
+    k.opacity(0),
+    "inhaleEffect",
+  ]);
+
   const inhaleZone = player.add([
     k.area({ shape: new k.Rect(k.vec2(0), 16, 4) }),
     k.pos(),
@@ -44,15 +52,21 @@ export function makePlayer(k: KaboomCtx, posX: number, posY: number) {
   inhaleZone.onUpdate(() => {
     if (player.direction === "left") {
       inhaleZone.pos = k.vec2(-14, 8);
+      inhaleEffect.pos = k.vec2(player.pos.x - 60, player.pos.y + 0);
+      inhaleEffect.flipX = true;
       return;
     }
     inhaleZone.pos = k.vec2(14, 8);
+    inhaleEffect.pos = k.vec2(player.pos.x + 60, player.pos.y + 0);
+    inhaleEffect.flipX = false;
   });
 
   return player;
 }
 
 export function setControls(k: KaboomCtx, player: PlayerGameObj) {
+  const inhaleEffectRef = k.get("inhaleEffect")[0];
+
   k.onKeyDown((key) => {
     switch (key) {
       case "left":
@@ -68,6 +82,7 @@ export function setControls(k: KaboomCtx, player: PlayerGameObj) {
       case "z":
         player.isInhaling = true;
         player.play("kirbInhaling");
+        inhaleEffectRef.opacity = 1;
         break;
       default:
     }
@@ -85,6 +100,7 @@ export function setControls(k: KaboomCtx, player: PlayerGameObj) {
       case "z":
         player.isInhaling = false;
         player.play("kirbIdle");
+        inhaleEffectRef.opacity = 0;
         break;
       default:
     }

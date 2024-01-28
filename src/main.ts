@@ -15,6 +15,7 @@ k.loadSprite("assets", "./kirby-like.png", {
     kirbIdle: 0,
     kirbInhaling: 1,
     kirbSwallowed: 2,
+    kirbInhaleEffect: { from: 3, to: 8, speed: 15, loop: true },
     flame: { from: 36, to: 37, speed: 4, loop: true },
     guyIdle: 18,
     guyWalk: { from: 18, to: 19, speed: 4, loop: true },
