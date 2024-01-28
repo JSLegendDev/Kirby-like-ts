@@ -36,17 +36,17 @@ export function makePlayer(k: KaboomCtx, posX: number, posY: number) {
   ]);
 
   const inhaleZone = player.add([
-    k.area({ shape: new k.Rect(k.vec2(0), 16, 8) }),
-    k.pos(14, 5),
+    k.area({ shape: new k.Rect(k.vec2(0), 16, 4) }),
+    k.pos(),
     "inhaleZone",
   ]);
 
   inhaleZone.onUpdate(() => {
     if (player.direction === "left") {
-      inhaleZone.pos = k.vec2(-14, 5);
+      inhaleZone.pos = k.vec2(-14, 8);
       return;
     }
-    inhaleZone.pos = k.vec2(14, 5);
+    inhaleZone.pos = k.vec2(14, 8);
   });
 
   return player;
@@ -112,7 +112,7 @@ export function makeInhalable(k: KaboomCtx, enemy: GameObj) {
   });
 
   enemy.onCollide("player", () => {
-    if (!playerRef.isInhaling) return;
+    if (!playerRef.isInhaling || !enemy.isInhalable) return;
     playerRef.isInhaling = false;
     k.destroy(enemy);
   });
