@@ -43,7 +43,10 @@ async function gameSetup() {
   });
   k.loadSprite("level-1", "./level-1.png");
 
+  k.add([k.rect(k.width(), k.height()), k.color(0, 0, 0), k.fixed()]);
+
   const { map, spawnPoints } = await makeMap(k, "level-1");
+
   k.scene("level-1", async () => {
     k.setGravity(2100);
     k.add([

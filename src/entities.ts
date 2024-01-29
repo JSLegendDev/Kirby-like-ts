@@ -157,8 +157,13 @@ export function setControls(k: KaboomCtx, player: PlayerGameObj) {
           player.play("kirbInhaling");
           const shootingStar = k.add([
             k.sprite("assets", { anim: "shootingStar" }),
-            k.area({ shape: new k.Rect(k.vec2(0), 5, 5) }),
-            k.pos(player.pos.x + 60, player.pos.y + 5),
+            k.area({ shape: new k.Rect(k.vec2(5, 4), 6, 6) }),
+            k.pos(
+              player.direction === "left"
+                ? player.pos.x - 80
+                : player.pos.x + 80,
+              player.pos.y + 5
+            ),
             k.scale(scale),
             player.direction === "left"
               ? k.move(k.LEFT, 400)
@@ -199,10 +204,10 @@ export function makeInhalable(k: KaboomCtx, enemy: GameObj) {
   enemy.onUpdate(() => {
     if (playerRef.isInhaling && enemy.isInhalable) {
       if (playerRef.direction === "right") {
-        enemy.moveTo(enemy.pos.sub(playerRef.pos), 400);
+        enemy.move(-400, 0);
         return;
       }
-      enemy.moveTo(enemy.pos.add(playerRef.pos), 400);
+      enemy.move(400, 0);
     }
   });
 }
@@ -214,11 +219,27 @@ export function makeFlameEnemy(k: KaboomCtx, posX: number, posY: number) {
     k.pos(posX * scale, posY * scale),
     k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
     k.body(),
+    k.state("idle", ["idle", "jump"]),
     "flame",
     "enemy",
   ]);
 
   makeInhalable(k, flame);
+
+  flame.onStateEnter("idle", async () => {
+    await k.wait(1);
+    flame.enterState("jump");
+  });
+
+  flame.onStateEnter("jump", async () => {
+    flame.jump(1000);
+  });
+
+  flame.onStateUpdate("jump", async () => {
+    if (flame.isGrounded()) {
+      flame.enterState("idle");
+    }
+  });
 
   return flame;
 }
@@ -230,12 +251,38 @@ export function makeGuyEnemy(k: KaboomCtx, posX: number, posY: number) {
     k.pos(posX * scale, posY * scale),
     k.area({ shape: new k.Rect(k.vec2(2, 3.9), 12, 12) }),
     k.body(),
-    { isInhalable: false },
+    k.state("idle", ["idle", "left", "right", "jump"]),
+    { isInhalable: false, speed: 100 },
     "guy",
     "enemy",
   ]);
 
   makeInhalable(k, guy);
+
+  guy.onStateEnter("idle", async () => {
+    await k.wait(1);
+    guy.enterState("left");
+  });
+
+  guy.onStateEnter("left", async () => {
+    guy.flipX = false;
+    await k.wait(2);
+    guy.enterState("right");
+  });
+
+  guy.onStateUpdate("left", () => {
+    guy.move(-guy.speed, 0);
+  });
+
+  guy.onStateEnter("right", async () => {
+    guy.flipX = true;
+    await k.wait(2);
+    guy.enterState("left");
+  });
+
+  guy.onStateUpdate("right", () => {
+    guy.move(guy.speed, 0);
+  });
 
   return guy;
 }
