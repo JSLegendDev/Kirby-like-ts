@@ -79,7 +79,15 @@ async function gameSetup() {
     }
 
     for (const bird of spawnPoints.bird) {
-      makeBirdEnemy(k, bird.x, bird.y);
+      const possibleSpeeds = [100, 200, 300];
+      k.loop(10, () => {
+        makeBirdEnemy(
+          k,
+          bird.x,
+          bird.y,
+          possibleSpeeds[Math.floor(Math.random() * possibleSpeeds.length)]
+        );
+      });
     }
   });
 

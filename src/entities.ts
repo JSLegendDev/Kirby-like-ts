@@ -156,7 +156,10 @@ export function setControls(k: KaboomCtx, player: PlayerGameObj) {
         if (player.isFull) {
           player.play("kirbInhaling");
           const shootingStar = k.add([
-            k.sprite("assets", { anim: "shootingStar" }),
+            k.sprite("assets", {
+              anim: "shootingStar",
+              flipX: player.direction === "right",
+            }),
             k.area({ shape: new k.Rect(k.vec2(5, 4), 6, 6) }),
             k.pos(
               player.direction === "left"
@@ -291,7 +294,12 @@ export function makeGuyEnemy(k: KaboomCtx, posX: number, posY: number) {
   return guy;
 }
 
-export function makeBirdEnemy(k: KaboomCtx, posX: number, posY: number) {
+export function makeBirdEnemy(
+  k: KaboomCtx,
+  posX: number,
+  posY: number,
+  speed: number
+) {
   const bird = k.add([
     k.sprite("assets", { anim: "bird" }),
     k.scale(scale),
@@ -301,6 +309,8 @@ export function makeBirdEnemy(k: KaboomCtx, posX: number, posY: number) {
       collisionIgnore: ["enemy"],
     }),
     k.body({ isStatic: true }),
+    k.move(k.LEFT, speed),
+    k.offscreen({ destroy: true, distance: 400 }),
     "enemy",
   ]);
 
