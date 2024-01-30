@@ -67,7 +67,7 @@ async function gameSetup() {
     k.add(kirb);
     k.camScale(k.vec2(0.7));
     k.onUpdate(() => {
-      k.camPos(kirb.pos.x + 500, 800);
+      if (kirb.pos.x < map.pos.x + map.width) k.camPos(kirb.pos.x + 500, 800);
     });
 
     for (const flame of spawnPoints.flame) {
