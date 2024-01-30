@@ -87,7 +87,7 @@ export function makePlayer(k: KaboomCtx, posX: number, posY: number) {
   ]);
 
   const inhaleZone = player.add([
-    k.area({ shape: new k.Rect(k.vec2(0), 16, 4) }),
+    k.area({ shape: new k.Rect(k.vec2(0), 20, 4) }),
     k.pos(),
     "inhaleZone",
   ]);
@@ -166,8 +166,8 @@ export function setControls(k: KaboomCtx, player: PlayerGameObj) {
             ),
             k.scale(scale),
             player.direction === "left"
-              ? k.move(k.LEFT, 400)
-              : k.move(k.RIGHT, 400),
+              ? k.move(k.LEFT, 800)
+              : k.move(k.RIGHT, 800),
             "shootingStar",
           ]);
           shootingStar.onCollide("platform", () => k.destroy(shootingStar));
@@ -204,10 +204,10 @@ export function makeInhalable(k: KaboomCtx, enemy: GameObj) {
   enemy.onUpdate(() => {
     if (playerRef.isInhaling && enemy.isInhalable) {
       if (playerRef.direction === "right") {
-        enemy.move(-400, 0);
+        enemy.move(-800, 0);
         return;
       }
-      enemy.move(400, 0);
+      enemy.move(800, 0);
     }
   });
 }
@@ -217,10 +217,12 @@ export function makeFlameEnemy(k: KaboomCtx, posX: number, posY: number) {
     k.sprite("assets", { anim: "flame" }),
     k.scale(scale),
     k.pos(posX * scale, posY * scale),
-    k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
+    k.area({
+      shape: new k.Rect(k.vec2(4, 6), 8, 10),
+      collisionIgnore: ["enemy"],
+    }),
     k.body(),
     k.state("idle", ["idle", "jump"]),
-    "flame",
     "enemy",
   ]);
 
@@ -249,11 +251,13 @@ export function makeGuyEnemy(k: KaboomCtx, posX: number, posY: number) {
     k.sprite("assets", { anim: "guyWalk" }),
     k.scale(scale),
     k.pos(posX * scale, posY * scale),
-    k.area({ shape: new k.Rect(k.vec2(2, 3.9), 12, 12) }),
+    k.area({
+      shape: new k.Rect(k.vec2(2, 3.9), 12, 12),
+      collisionIgnore: ["enemy"],
+    }),
     k.body(),
     k.state("idle", ["idle", "left", "right", "jump"]),
     { isInhalable: false, speed: 100 },
-    "guy",
     "enemy",
   ]);
 
@@ -292,9 +296,11 @@ export function makeBirdEnemy(k: KaboomCtx, posX: number, posY: number) {
     k.sprite("assets", { anim: "bird" }),
     k.scale(scale),
     k.pos(posX * scale, posY * scale),
-    k.area({ shape: new k.Rect(k.vec2(4, 6), 8, 10) }),
+    k.area({
+      shape: new k.Rect(k.vec2(4, 6), 8, 10),
+      collisionIgnore: ["enemy"],
+    }),
     k.body({ isStatic: true }),
-    "bird",
     "enemy",
   ]);
 
