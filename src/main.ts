@@ -106,7 +106,7 @@ async function gameSetup() {
 
   k.scene("level-2", () => {
     globalGameState.setCurrentScene("level-2");
-    globalGameState.setNextScene("end");
+    globalGameState.setNextScene("level-1");
     k.setGravity(2100);
     k.add([
       k.rect(k.width(), k.height()),
