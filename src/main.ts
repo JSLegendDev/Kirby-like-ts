@@ -43,12 +43,22 @@ async function gameSetup() {
     },
   });
   k.loadSprite("level-1", "./level-1.png");
+  k.loadSprite("level-2", "./level-2.png");
 
   k.add([k.rect(k.width(), k.height()), k.color(0, 0, 0), k.fixed()]);
 
-  const { map, spawnPoints } = await makeMap(k, "level-1");
+  const { map: level1Layout, spawnPoints: level1SpawnPoints } = await makeMap(
+    k,
+    "level-1"
+  );
+
+  const { map: level2Layout, spawnPoints: level2SpawnPoints } = await makeMap(
+    k,
+    "level-2"
+  );
 
   k.scene("level-1", async () => {
+    globalGameState.setCurrentScene("level-1");
     globalGameState.setNextScene("level-2");
     k.setGravity(2100);
     k.add([
@@ -57,30 +67,31 @@ async function gameSetup() {
       k.fixed(),
     ]);
 
-    k.add(map);
+    k.add(level1Layout);
 
     const kirb = makePlayer(
       k,
-      spawnPoints.player[0].x,
-      spawnPoints.player[0].y
+      level1SpawnPoints.player[0].x,
+      level1SpawnPoints.player[0].y
     );
 
     setControls(k, kirb);
     k.add(kirb);
     k.camScale(k.vec2(0.7));
     k.onUpdate(() => {
-      if (kirb.pos.x < map.pos.x + map.width) k.camPos(kirb.pos.x + 500, 800);
+      if (kirb.pos.x < level1Layout.pos.x + 432)
+        k.camPos(kirb.pos.x + 500, 800);
     });
 
-    for (const flame of spawnPoints.flame) {
+    for (const flame of level1SpawnPoints.flame) {
       makeFlameEnemy(k, flame.x, flame.y);
     }
 
-    for (const guy of spawnPoints.guy) {
+    for (const guy of level1SpawnPoints.guy) {
       makeGuyEnemy(k, guy.x, guy.y);
     }
 
-    for (const bird of spawnPoints.bird) {
+    for (const bird of level1SpawnPoints.bird) {
       const possibleSpeeds = [100, 200, 300];
       k.loop(10, () => {
         makeBirdEnemy(
@@ -93,7 +104,53 @@ async function gameSetup() {
     }
   });
 
-  k.scene("level-2", () => {});
+  k.scene("level-2", () => {
+    globalGameState.setCurrentScene("level-2");
+    globalGameState.setNextScene("end");
+    k.setGravity(2100);
+    k.add([
+      k.rect(k.width(), k.height()),
+      k.color(k.Color.fromHex("#f7d7db")),
+      k.fixed(),
+    ]);
+
+    k.add(level2Layout);
+    const kirb = makePlayer(
+      k,
+      level2SpawnPoints.player[0].x,
+      level2SpawnPoints.player[0].y
+    );
+
+    setControls(k, kirb);
+    k.add(kirb);
+    k.camScale(k.vec2(0.7));
+    k.onUpdate(() => {
+      if (kirb.pos.x < level2Layout.pos.x + 2100)
+        k.camPos(kirb.pos.x + 500, 800);
+    });
+
+    for (const flame of level2SpawnPoints.flame) {
+      makeFlameEnemy(k, flame.x, flame.y);
+    }
+
+    for (const guy of level2SpawnPoints.guy) {
+      makeGuyEnemy(k, guy.x, guy.y);
+    }
+
+    for (const bird of level2SpawnPoints.bird) {
+      const possibleSpeeds = [100, 200, 300];
+      k.loop(10, () => {
+        makeBirdEnemy(
+          k,
+          bird.x,
+          bird.y,
+          possibleSpeeds[Math.floor(Math.random() * possibleSpeeds.length)]
+        );
+      });
+    }
+  });
+
+  k.scene("end", () => {});
 
   k.go("level-1");
 }
