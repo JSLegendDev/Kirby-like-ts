@@ -7,6 +7,7 @@ import {
   makePlayer,
   setControls,
 } from "./entities";
+import { globalGameState } from "./state";
 
 k.loadSprite("assets", "./kirby-like.png", {
   sliceX: 9,
@@ -48,6 +49,7 @@ async function gameSetup() {
   const { map, spawnPoints } = await makeMap(k, "level-1");
 
   k.scene("level-1", async () => {
+    globalGameState.setNextScene("level-2");
     k.setGravity(2100);
     k.add([
       k.rect(k.width(), k.height()),
@@ -90,6 +92,8 @@ async function gameSetup() {
       });
     }
   });
+
+  k.scene("level-2", () => {});
 
   k.go("level-1");
 }
