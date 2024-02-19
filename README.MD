@@ -9,7 +9,7 @@ Learn how to build this game by following my tutorial : https://www.youtube.com/
 Everything was made by me including the art which you can use in your games.
 
 
-## How to run the project?
+## How to run the project ?
 
 Assuming you have `node` installed.
 - Install dependencies with `npm install`
